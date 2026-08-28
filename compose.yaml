@@ -1,45 +1,16 @@
 services:
-
-  mysql:
-    image: mysql:8.4
-    container_name: leveyqc-mysql
-
-    environment:
-      MYSQL_DATABASE: LeveyCentral
-      MYSQL_USER: leveyqc
-      MYSQL_PASSWORD: leveyqc123
-      MYSQL_ROOT_PASSWORD: root123
-
-    ports:
-      - "3309:3306"
-
-    volumes:
-      - leveyqc_mysql_data:/var/lib/mysql
-
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 20s
-
-
   backend:
     build: .
     container_name: leveyqc-backend
-
-    depends_on:
-      mysql:
-        condition: service_healthy
+    restart: unless-stopped
 
     ports:
       - "8080:8080"
 
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/LeveyCentral
-      SPRING_DATASOURCE_USERNAME: leveyqc
-      SPRING_DATASOURCE_PASSWORD: leveyqc123
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3308/LeveyCentral
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
 
-
-volumes:
-  leveyqc_mysql_data:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
