@@ -29,8 +29,8 @@ public class LaboratorioClinico {
     private Integer activo;
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaModificacion;
-    private Long usuarioCreacionId;
-    private Long usuarioModificacionId;
+    private String usuarioCreacionId;
+    private String usuarioModificacionId;
 
     public LaboratorioClinico(){
     }

@@ -35,6 +35,67 @@ public class LaboratorioClinicoController {
     }
 
 
+
+
+    //DEBUGUING
+    private void debug(LaboratorioClinico laboratorioClinico){
+
+        System.out.println("--------------------");
+        System.out.println("DATOS RECIBIDOS:");
+        System.out.println("--------------------");
+
+        System.out.println("LABORATORIO ID:");
+        System.out.println(laboratorioClinico.getIdLaboratorioClinico());
+        System.out.println(" ");
+
+        System.out.println("LABORATORIO NOMBRE:");
+        System.out.println(laboratorioClinico.getNombreLaboratorioClinico());
+
+        System.out.println("CLERK ID:");
+        System.out.println(laboratorioClinico.getClerkOrganizationId());
+        System.out.println(" ");
+
+        System.out.println("CIUDAD:");
+        System.out.println(laboratorioClinico.getCiudad());
+        System.out.println(" ");
+
+        System.out.println("COMUNA:");
+        System.out.println(laboratorioClinico.getComuna());
+        System.out.println(" ");
+
+        System.out.println("PAIS:");
+        System.out.println(laboratorioClinico.getPais());
+        System.out.println(" ");
+
+        System.out.println("ACTIVO:");
+        System.out.println(laboratorioClinico.getActivo());
+        System.out.println(" ");
+
+        System.out.println("REPRESENTANTE LEGAL:");
+        System.out.println(laboratorioClinico.getRepresentanteLegal());
+        System.out.println(" ");
+
+        System.out.println("EMAIL CONTACTO:");
+        System.out.println(laboratorioClinico.getEmailContacto());
+        System.out.println(" ");
+
+        System.out.println("TELEFONO:");
+        System.out.println(laboratorioClinico.getTelefonoContacto());
+        System.out.println(" ");
+
+        System.out.println("USUARIO CREADOR:");
+        System.out.println(laboratorioClinico.getUsuarioCreacionId());
+        System.out.println(" ");
+
+        System.out.println("USUARIO MODIFICADOR:");
+        System.out.println(laboratorioClinico.getUsuarioModificacionId());
+        System.out.println(" ");
+
+        System.out.println("--------------------");
+    }
+
+
+
     /*
     + crearLaboratorio(req: Request, res: Response): Response
     {POST /laboratorios-clinicos/insertar}
@@ -42,9 +103,9 @@ public class LaboratorioClinicoController {
 
     @PostMapping("/laboratorios-clinicos/insertar")
     public ResponseEntity<DTO> crearLaboratorio(@RequestBody LaboratorioClinico nuevoLaboratorio){
+        debug(nuevoLaboratorio);
         DTO res = new DTO();
         LaboratorioClinico laboratorioClinicoInsertado =  service.crearLaboratorio(nuevoLaboratorio);
-
         if(laboratorioClinicoInsertado == null){
             res.setSuccess(false);
             res.setMessage("No fue posible realizar la insercion, faltan datos");
@@ -122,6 +183,7 @@ public class LaboratorioClinicoController {
 
     @PutMapping("/laboratorios-clinicos/actualizar")
     public ResponseEntity<DTO> actualizarLaboratorio(@RequestBody LaboratorioClinico laboratorioClinicoModificaciones){
+        debug(laboratorioClinicoModificaciones);
         DTO res = new DTO();
         LaboratorioClinico modificacion = service.actualizarLaboratorio(laboratorioClinicoModificaciones);
 
@@ -172,13 +234,35 @@ public class LaboratorioClinicoController {
 
 
 
+    @PatchMapping("/laboratorios-clinicos/{idLaboratorioClinico}/desactivar")
+    public ResponseEntity<DTO> desactivarLaboratorio(@PathVariable Long idLaboratorioClinico){
+        DTO res = new DTO();
+        LaboratorioClinico laboratorioClinicoModificado = service.desactivarLaboratorio(idLaboratorioClinico);
+
+        if (laboratorioClinicoModificado == null){
+            res.setSuccess(false);
+            res.setMessage("No fue posible desactivar la cuenta, el dato no enviado es nulo o invalido.");
+            res.setData(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+        }else{
+            res.setSuccess(true);
+            res.setMessage("Cuenta desactivada");
+            res.setData(null);
+            return ResponseEntity.status(HttpStatus.OK).body(res);
+        }
+    }
+
+
+
+
+
     /*
 
 
 + buscarPorOrganizacion(req: Request, res: Response): Response
   {GET /laboratorios-clinicos/organizacion/{clerkOrganizationId}}
-
     * */
+
     @GetMapping("/laboratorios-clinicos/organizacion/{clerkOrganizationId}")
     public ResponseEntity<DTO> buscarPorOrganizacion(@PathVariable  String clerkOrganizationId){
         DTO respuesta = new DTO();

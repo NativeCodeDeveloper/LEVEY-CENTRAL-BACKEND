@@ -25,7 +25,7 @@ public class LaboratorioClinicoService {
     //completo que se le paso como parametro a la funcion.
     private boolean validacionCamposNulosActualizacion(LaboratorioClinico lab){
         if (lab==null)return false;
-        if( lab.getClerkOrganizationId() == null)  return false;
+        if( lab.getIdLaboratorioClinico() == null)  return false;
         if( lab.getNombreLaboratorioClinico() == null)  return false;
         if( lab.getRutInstitucion() == null)  return false;
         if( lab.getRepresentanteLegal() == null)  return false;
@@ -36,7 +36,6 @@ public class LaboratorioClinicoService {
         if( lab.getCiudad() == null)  return false;
         if( lab.getRegion() == null)  return false;
         if( lab.getPais() == null)  return false;
-        if( lab.getActivo() == null)  return false;
         if( lab.getUsuarioModificacionId() == null)  return false;
 
         return true;
@@ -56,7 +55,6 @@ public class LaboratorioClinicoService {
             if( nuevoLaboratorioClinico.getCiudad() == null)  return null;
             if( nuevoLaboratorioClinico.getRegion() == null)  return null;
             if( nuevoLaboratorioClinico.getPais() == null)  return null;
-            if( nuevoLaboratorioClinico.getActivo() == null)  return null;
             if( nuevoLaboratorioClinico.getUsuarioCreacionId() == null)  return null;
 
            return repository.save(nuevoLaboratorioClinico);
