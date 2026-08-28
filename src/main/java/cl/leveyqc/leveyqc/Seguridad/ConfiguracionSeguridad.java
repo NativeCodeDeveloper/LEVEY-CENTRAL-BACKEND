@@ -30,6 +30,7 @@ public class ConfiguracionSeguridad {
     public SecurityFilterChain cadenaDeSeguridad(HttpSecurity http) throws Exception{
         http.authorizeHttpRequests(autenticacion->autenticacion
                 .requestMatchers("/").permitAll()
+                .requestMatchers("/laboratorios-clinicos").permitAll()
                 .anyRequest().authenticated());
 
         http.sessionManagement(sesion->sesion
