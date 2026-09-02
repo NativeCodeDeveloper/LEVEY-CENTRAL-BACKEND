@@ -1,8 +1,15 @@
 package cl.leveyqc.leveyqc.UsuariosLevey.service;
 
+import cl.leveyqc.leveyqc.LaboratorioClinico.model.LaboratorioClinico;
+import cl.leveyqc.leveyqc.LaboratorioClinico.service.LaboratorioClinicoService;
 import cl.leveyqc.leveyqc.UsuariosLevey.model.UsuariosLevey;
 import cl.leveyqc.leveyqc.UsuariosLevey.repository.UsuariosLeveyRepository;
+import com.clerk.backend_api.models.operations.CreateOrganizationMembershipRequestBody;
 import org.springframework.stereotype.Service;
+import com.clerk.backend_api.Clerk;
+import com.clerk.backend_api.models.components.User;
+import com.clerk.backend_api.models.operations.CreateUserRequestBody;
+import com.clerk.backend_api.models.operations.CreateUserResponse;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -14,15 +21,16 @@ import java.util.Optional;
 public class UsuariosLeveyService {
 
     private final UsuariosLeveyRepository repository;
+    private final LaboratorioClinicoService laboratorioClinicoService;
 
-    public UsuariosLeveyService(UsuariosLeveyRepository repository) {
+    public UsuariosLeveyService(UsuariosLeveyRepository repository, LaboratorioClinicoService laboratorioClinicoService) {
         this.repository = repository;
+        this.laboratorioClinicoService = laboratorioClinicoService;
     }
 
     private UsuariosLevey validacionInsercion(UsuariosLevey usuarioValidar){
         if (usuarioValidar == null ) return null;
         if (usuarioValidar.getNombre() ==null || usuarioValidar.getNombre().isBlank()) return null ;
-        if (usuarioValidar.getClerkUserId() ==null || usuarioValidar.getClerkUserId().isBlank()) return null ;
         if (usuarioValidar.getApellido() ==null || usuarioValidar.getApellido().isBlank()) return null ;
         if (usuarioValidar.getRut() ==null || usuarioValidar.getRut().isBlank()) return null ;
         if (usuarioValidar.getEmail() ==null || usuarioValidar.getEmail().isBlank()) return null ;
@@ -35,18 +43,100 @@ public class UsuariosLeveyService {
         return usuarioValidar;
     }
 
-    //+ crearUsuarioLevey(UsuariosLevey: nuevoUsuario): UsuariosLevey
-    public UsuariosLevey crearUsuarioLevey(UsuariosLevey nuevoUsuario){
-        UsuariosLevey usuarioDatosValidados = validacionInsercion(nuevoUsuario);
+    // + crearUsuarioLevey(UsuariosLevey nuevoUsuario, String password): UsuariosLevey
+    public UsuariosLevey crearUsuarioLevey(
+            UsuariosLevey nuevoUsuario,
+            String password
+    ) {
 
-        if(usuarioDatosValidados == null){
+        UsuariosLevey usuarioDatosValidados =
+                validacionInsercion(nuevoUsuario);
+
+        if (usuarioDatosValidados == null) {
             return null;
-        }else{
-            return repository.save(usuarioDatosValidados);
         }
+
+        // Validar contraseña antes de llamar a Clerk
+        if (password == null || password.isBlank()) {
+            return null;
+        }
+
+        // Buscar laboratorio en MySQL
+        LaboratorioClinico laboratorioEncontradoPorId =
+                laboratorioClinicoService.obtenerPorId(
+                        usuarioDatosValidados.getIdLaboratorioClinico()
+                );
+
+        if (laboratorioEncontradoPorId == null) {
+            return null;
+        }
+
+        // Obtener organizationId de Clerk
+        String organizationId =
+                laboratorioEncontradoPorId.getClerkOrganizationId();
+
+        if (organizationId == null || organizationId.isBlank()) {
+            return null;
+        }
+
+        // Crear cliente Clerk
+        Clerk clerk = Clerk.builder()
+                .bearerAuth(System.getenv("CLERK_SECRET_KEY"))
+                .build();
+
+        // Preparar datos del usuario para Clerk
+        CreateUserRequestBody datosClerk =
+                CreateUserRequestBody.builder()
+                        .firstName(
+                                usuarioDatosValidados.getNombre()
+                        )
+                        .lastName(
+                                usuarioDatosValidados.getApellido()
+                        )
+                        .username(
+                                usuarioDatosValidados.getUsername()
+                        )
+                        .password(password)
+                        .build();
+
+        // Crear usuario en Clerk
+        CreateUserResponse respuestaClerk =
+                clerk.users()
+                        .create()
+                        .request(datosClerk)
+                        .call();
+
+        // Obtener usuario creado
+        User usuarioCreadoClerk =
+                respuestaClerk.user()
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Clerk no devolvió el usuario creado"
+                                )
+                        );
+
+        // Obtener Clerk User ID
+        String clerkUserId =
+                usuarioCreadoClerk.id();
+
+        // Agregar usuario a la organización Clerk
+        clerk.organizationMemberships()
+                .create()
+                .organizationId(organizationId)
+                .requestBody(
+                        CreateOrganizationMembershipRequestBody.builder()
+                                .userId(clerkUserId)
+                                .role("org:member")
+                                .build()
+                )
+                .call();
+
+        // Guardar Clerk User ID en entidad local
+        usuarioDatosValidados.setClerkUserId(clerkUserId);
+
+        // Guardar usuario en MySQL
+        return repository.save(usuarioDatosValidados);
     }
-
-
 
 
     //+ listarUsuariosLevey(): List<UsuariosLevey>

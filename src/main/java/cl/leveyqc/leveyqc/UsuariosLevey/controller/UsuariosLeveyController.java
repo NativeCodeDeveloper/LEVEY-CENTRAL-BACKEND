@@ -1,6 +1,7 @@
 package cl.leveyqc.leveyqc.UsuariosLevey.controller;
 
 import cl.leveyqc.leveyqc.DTO.DTO;
+import cl.leveyqc.leveyqc.DTO.CracionUsuariosDTO;
 import cl.leveyqc.leveyqc.UsuariosLevey.model.UsuariosLevey;
 import cl.leveyqc.leveyqc.UsuariosLevey.service.UsuariosLeveyService;
 import org.springframework.http.HttpStatus;
@@ -19,13 +20,55 @@ public class UsuariosLeveyController {
 
 
 
+    private void debugObjeto(UsuariosLevey usuario) {
+
+        System.out.println("\n========== DEBUG USUARIO LEVEY ==========");
+
+        if (usuario == null) {
+            System.out.println("El objeto UsuariosLevey es NULL");
+            System.out.println("=========================================\n");
+            return;
+        }
+
+        System.out.println("ID Usuario Levey       : " + usuario.getIdUsuarioLevey());
+        System.out.println("Clerk User ID          : " + usuario.getClerkUserId());
+        System.out.println("Nombre                 : " + usuario.getNombre());
+        System.out.println("Apellido               : " + usuario.getApellido());
+        System.out.println("RUT                     : " + usuario.getRut());
+        System.out.println("Email                   : " + usuario.getEmail());
+        System.out.println("Profesión               : " + usuario.getProfesion());
+        System.out.println("Username                : " + usuario.getUsername());
+        System.out.println("Teléfono                : " + usuario.getTelefono());
+
+        System.out.println("ID Laboratorio Clínico : " + usuario.getIdLaboratorioClinico());
+        System.out.println("ID Tipo Usuario        : " + usuario.getIdTipoUsuarios());
+        System.out.println("Estado Usuario         : " + usuario.getEstadoUsuario());
+
+        System.out.println("Fecha Último Acceso    : " + usuario.getFechaUltimoAcceso());
+        System.out.println("Fecha Creación         : " + usuario.getFechaCreacion());
+        System.out.println("Fecha Modificación     : " + usuario.getFechaModificacion());
+
+        System.out.println("Usuario Creación ID    : " + usuario.getUsuarioCreacionId());
+        System.out.println("Usuario Modificación ID: " + usuario.getUsuarioModificacionId());
+
+        System.out.println("=========================================\n");
+    }
+
 // crearUsuarioLevey(nuevoUsuario: DTO)
 // POST /usuarios-levey/insertar
     @PostMapping("/usuarios-levey/insertar")
-    public ResponseEntity<DTO> crearUsuarioLevey (@RequestBody UsuariosLevey nuevoUsuario){
+    public ResponseEntity<DTO> crearUsuarioLevey (@RequestBody CracionUsuariosDTO data){
+        UsuariosLevey nuevoUsuario = data.getUsuario();
+        String password = data.getPassword();
+        debugObjeto(nuevoUsuario);
+        System.out.println("Password recibido: " + password); // SOLO DEBUG TEMPORAL
+
         DTO respuesta = new DTO();
-        UsuariosLevey usuarioInsertado =  service.crearUsuarioLevey(nuevoUsuario);
-        if (usuarioInsertado == null){
+        UsuariosLevey usuarioInsertado = service.crearUsuarioLevey(
+                nuevoUsuario,
+                password
+
+        );        if (usuarioInsertado == null){
             respuesta.setMessage("No fue posible insertar usuario en la base de datos");
             respuesta.setSuccess(false);
             respuesta.setData(null);

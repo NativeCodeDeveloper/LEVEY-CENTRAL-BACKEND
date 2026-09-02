@@ -28,8 +28,8 @@ public class UsuariosLevey {
  private LocalDateTime fechaUltimoAcceso;
  private LocalDateTime fechaCreacion;
  private LocalDateTime  fechaModificacion;
- private Long usuarioCreacionId;
- private Long usuarioModificacionId;
+ private String usuarioCreacionId;
+ private String usuarioModificacionId;
 
     public UsuariosLevey() {
     }
