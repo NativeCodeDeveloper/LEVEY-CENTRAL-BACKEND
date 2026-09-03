@@ -2,6 +2,7 @@ package cl.leveyqc.leveyqc.UsuariosLevey.controller;
 
 import cl.leveyqc.leveyqc.DTO.DTO;
 import cl.leveyqc.leveyqc.DTO.CracionUsuariosDTO;
+import cl.leveyqc.leveyqc.DTO.EdicionUsuariosDTO;
 import cl.leveyqc.leveyqc.UsuariosLevey.model.UsuariosLevey;
 import cl.leveyqc.leveyqc.UsuariosLevey.service.UsuariosLeveyService;
 import org.springframework.http.HttpStatus;
@@ -89,7 +90,7 @@ public class UsuariosLeveyController {
 @GetMapping("/usuarios-levey")
 public ResponseEntity<DTO> listarUsuariosLevey(){
     DTO respuesta = new DTO();
-    List<UsuariosLevey> listado =  service.listarUsuariosLevey();
+    List<Object[]> listado =  service.listarUsuariosLeveyLaboratorioPerfil();
     if (listado.isEmpty()){
         respuesta.setMessage("No se encontraron usuarios en registrados");
         respuesta.setSuccess(false);
@@ -190,9 +191,11 @@ public ResponseEntity<DTO> buscarUsuarioPorEmail(@PathVariable String email){
 // actualizarUsuarioLevey(usuarioActualizar: UsuariosLevey)
 // PUT /usuarios-levey/actualizar
 @PutMapping("/usuarios-levey/actualizar")
-public ResponseEntity<DTO> actualizarUsuarioLevey(@RequestBody UsuariosLevey usuarioActualizar){
+public ResponseEntity<DTO> actualizarUsuarioLevey(@RequestBody EdicionUsuariosDTO dto){
+    debugObjeto(dto.getUser());
+    System.out.println("Password a cambiar :" + dto.getPassword());
     DTO respuesta = new DTO();
-    UsuariosLevey usuarioActualizado =  service.actualizarUsuarioLevey(usuarioActualizar);
+    UsuariosLevey usuarioActualizado =  service.actualizarUsuarioLevey(dto);
     if (usuarioActualizado == null){
         respuesta.setMessage("No se logro actualizar usuario.");
         respuesta.setSuccess(false);
@@ -272,6 +275,11 @@ public ResponseEntity<DTO> bloquearUsuario(@PathVariable Long idUsuarioLevey){
 // PATCH /usuarios-levey/{idUsuarioLevey}/desactivar
 @PatchMapping("/usuarios-levey/{idUsuarioLevey}/desactivar")
 public ResponseEntity<DTO> desactivarUsuarios(@PathVariable Long idUsuarioLevey){
+    System.out.println("-------------------------------------- ");
+        System.out.println("ID QUE LLLEGA DESDE EL FRONT:");
+    System.out.println(idUsuarioLevey);
+    System.out.println("-------------------------------------- ");
+
     DTO respuesta = new DTO();
     boolean success =  service.desactivarUsuario(idUsuarioLevey);
     if (!success){

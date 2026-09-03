@@ -47,6 +47,11 @@ public class FiltroAdministradorActivo extends OncePerRequestFilter {
         }
 
         String clerkUserId = jwt.getSubject();
+        System.out.println("-------------------------------");
+        System.out.println("SEGURIDAD LOGS");
+        System.out.println("-------------------------------");
+        System.out.println("clerkUserId : " + clerkUserId);
+        System.out.println("-------------------------------");
         boolean verificacionClerk = service.verificarUsuarioClerkActivo(clerkUserId);
 
         if (!verificacionClerk){

@@ -1,27 +1,32 @@
 package cl.leveyqc.leveyqc.UsuariosLevey.service;
 
+import cl.leveyqc.leveyqc.DTO.EdicionUsuariosDTO;
 import cl.leveyqc.leveyqc.LaboratorioClinico.model.LaboratorioClinico;
 import cl.leveyqc.leveyqc.LaboratorioClinico.service.LaboratorioClinicoService;
 import cl.leveyqc.leveyqc.UsuariosLevey.model.UsuariosLevey;
 import cl.leveyqc.leveyqc.UsuariosLevey.repository.UsuariosLeveyRepository;
 import com.clerk.backend_api.models.operations.CreateOrganizationMembershipRequestBody;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import com.clerk.backend_api.Clerk;
 import com.clerk.backend_api.models.components.User;
 import com.clerk.backend_api.models.operations.CreateUserRequestBody;
 import com.clerk.backend_api.models.operations.CreateUserResponse;
+import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UsuariosLeveyService {
 
     private final UsuariosLeveyRepository repository;
     private final LaboratorioClinicoService laboratorioClinicoService;
+
+    @Value("${CLERK_SECRET_KEY}")
+    private String clerkSecretKey;
 
     public UsuariosLeveyService(UsuariosLeveyRepository repository, LaboratorioClinicoService laboratorioClinicoService) {
         this.repository = repository;
@@ -170,6 +175,12 @@ public class UsuariosLeveyService {
 
 
 
+    //+ listarUsuariosLeveyLaboratorioPerfil(): List<List<Object[]>
+    public List<Object[]> listarUsuariosLeveyLaboratorioPerfil (){
+        return repository.findUsuariosJoinLaboratorioPerfil();
+    }
+
+
 
     //+ buscarUsuarioPorClerkUserId(clerkUserId: String): List<UsuariosLevey>
     public List<UsuariosLevey> buscarUsuarioPorClerkUserId(String clerkUserId){
@@ -193,32 +204,232 @@ public class UsuariosLeveyService {
         }
     }
 
-    //+ actualizarUsuarioLevey(usuarioActualizar : UsuariosLevey): UsuariosLevey
-    public UsuariosLevey actualizarUsuarioLevey(UsuariosLevey usuarioActualizar){
-        if (usuarioActualizar == null || usuarioActualizar.getIdUsuarioLevey() == null) return null;
 
-        Optional<UsuariosLevey> usuarioBuscado = repository.findById(usuarioActualizar.getIdUsuarioLevey());
-        UsuariosLevey usuarioEncontrado;
+    private UsuariosLevey validacionActualizacion(UsuariosLevey usuarioValidar){
+        if (usuarioValidar == null ) return null;
+        if (usuarioValidar.getIdUsuarioLevey() ==null) return null ;
+        if (usuarioValidar.getNombre() ==null || usuarioValidar.getNombre().isBlank()) return null ;
+        if (usuarioValidar.getApellido() ==null || usuarioValidar.getApellido().isBlank()) return null ;
+        if (usuarioValidar.getRut() ==null || usuarioValidar.getRut().isBlank()) return null ;
+        if (usuarioValidar.getEmail() ==null || usuarioValidar.getEmail().isBlank()) return null ;
+        if (usuarioValidar.getProfesion() ==null || usuarioValidar.getProfesion().isBlank()) return null ;
+        if (usuarioValidar.getUsername() ==null || usuarioValidar.getUsername().isBlank() ) return null ;
+        if (usuarioValidar.getTelefono() ==null || usuarioValidar.getTelefono().isBlank()) return null ;
+        if (usuarioValidar.getIdLaboratorioClinico() ==null ) return null;
+        if (usuarioValidar.getIdTipoUsuarios() ==null) return null;
+        if (usuarioValidar.getUsuarioModificacionId() ==null) return null;
+        return usuarioValidar;
+    }
 
-        if (usuarioBuscado.isPresent()){
-            usuarioEncontrado = usuarioBuscado.get();
-            usuarioEncontrado.setNombre(usuarioActualizar.getNombre());
-            usuarioEncontrado.setApellido(usuarioActualizar.getApellido());
-            usuarioEncontrado.setRut(usuarioActualizar.getRut());
-            usuarioEncontrado.setEmail(usuarioActualizar.getEmail());
-            usuarioEncontrado.setProfesion(usuarioActualizar.getProfesion());
-            usuarioEncontrado.setUsername(usuarioActualizar.getUsername());
-            usuarioEncontrado.setTelefono(usuarioActualizar.getTelefono());
-            usuarioEncontrado.setIdLaboratorioClinico(usuarioActualizar.getIdLaboratorioClinico());
-            usuarioEncontrado.setIdTipoUsuarios(usuarioActualizar.getIdTipoUsuarios());
-            usuarioEncontrado.setUsuarioModificacionId(usuarioActualizar.getUsuarioModificacionId());
 
-            return repository.save(usuarioEncontrado);
-        }else{
-            return null;
+
+
+    private void actualizarUsuarioClerk(
+            String clerkUserId,
+            String nombre,
+            String apellido,
+            String username,
+            String password
+    ) {
+
+        try {
+
+            Map<String, Object> body = new HashMap<>();
+
+            body.put("first_name", nombre);
+            body.put("last_name", apellido);
+            body.put("username", username);
+
+            if (password != null && !password.isBlank()) {
+                body.put("password", password);
+                body.put("sign_out_of_other_sessions", true);
+            }
+
+            RestClient restClient = RestClient.builder()
+                    .baseUrl("https://api.clerk.com/v1")
+                    .defaultHeader(
+                            HttpHeaders.AUTHORIZATION,
+                            "Bearer " + clerkSecretKey
+                    )
+                    .defaultHeader(
+                            HttpHeaders.CONTENT_TYPE,
+                            MediaType.APPLICATION_JSON_VALUE
+                    )
+                    .build();
+
+            restClient.patch()
+                    .uri("/users/{userId}", clerkUserId)
+                    .body(body)
+                    .retrieve()
+                    .toBodilessEntity();
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "Error actualizando usuario en Clerk: " + e.getMessage()
+            );
+
+            throw new RuntimeException(
+                    "No fue posible actualizar el usuario en Clerk",
+                    e
+            );
         }
     }
 
+
+
+
+    private void cambiarOrganizacionClerk(
+            String clerkUserId,
+            String organizationAnterior,
+            String organizationNueva
+    ) {
+
+        try {
+
+            System.out.println("===== CAMBIO ORGANIZACION CLERK =====");
+            System.out.println("Clerk User ID        : " + clerkUserId);
+            System.out.println("Organizacion anterior: " + organizationAnterior);
+            System.out.println("Organizacion nueva   : " + organizationNueva);
+            System.out.println("=====================================");
+
+            RestClient restClient = RestClient.builder()
+                    .baseUrl("https://api.clerk.com/v1")
+                    .defaultHeader(
+                            HttpHeaders.AUTHORIZATION,
+                            "Bearer " + clerkSecretKey
+                    )
+                    .defaultHeader(
+                            HttpHeaders.CONTENT_TYPE,
+                            MediaType.APPLICATION_JSON_VALUE
+                    )
+                    .build();
+
+            // Quitar de organización anterior
+            restClient.delete()
+                    .uri(
+                            "/organizations/{organizationId}/memberships/{userId}",
+                            organizationAnterior,
+                            clerkUserId
+                    )
+                    .retrieve()
+                    .toBodilessEntity();
+
+            System.out.println("Usuario eliminado de organización anterior");
+
+            Map<String, Object> body = new HashMap<>();
+
+            body.put("user_id", clerkUserId);
+            body.put("role", "org:member");
+
+            // Agregar a organización nueva
+            restClient.post()
+                    .uri(
+                            "/organizations/{organizationId}/memberships",
+                            organizationNueva
+                    )
+                    .body(body)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            System.out.println("Usuario agregado a nueva organización");
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "ERROR CAMBIANDO ORGANIZACION CLERK: " + e.getMessage()
+            );
+
+            throw new RuntimeException(
+                    "No fue posible cambiar la organización del usuario",
+                    e
+            );
+        }
+    }
+
+
+
+    public UsuariosLevey actualizarUsuarioLevey(EdicionUsuariosDTO informacionEdicion) {
+
+        if (informacionEdicion == null) return null;
+
+        UsuariosLevey userExtraccion = validacionActualizacion(informacionEdicion.getUser());
+
+        if (userExtraccion == null) return null;
+
+        Optional<UsuariosLevey> usuarioBuscado =repository.findById(userExtraccion.getIdUsuarioLevey());
+
+        if (usuarioBuscado.isEmpty()) {
+            return null;
+        }
+
+        UsuariosLevey usuarioEncontrado = usuarioBuscado.get();
+
+        String clerkUserId = usuarioEncontrado.getClerkUserId();
+
+        if (clerkUserId == null || clerkUserId.isBlank()) {
+            return null;
+        }
+
+        // Guardamos laboratorio ACTUAL antes de modificarlo
+        Long idLaboratorioAnterior = usuarioEncontrado.getIdLaboratorioClinico();
+        Long idLaboratorioNuevo =  userExtraccion.getIdLaboratorioClinico();
+
+
+        // =========================
+        // ACTUALIZAR USUARIO CLERK
+        // =========================
+
+        actualizarUsuarioClerk(
+                clerkUserId,
+                userExtraccion.getNombre(),
+                userExtraccion.getApellido(),
+                userExtraccion.getUsername(),
+                informacionEdicion.getPassword()
+        );
+
+
+        // =========================
+        // CAMBIAR ORGANIZACIÓN
+        // SOLO SI CAMBIÓ LABORATORIO
+        // =========================
+
+        if (!Objects.equals(idLaboratorioAnterior,idLaboratorioNuevo)) {
+            LaboratorioClinico laboratorioAnterior = laboratorioClinicoService.obtenerPorId(idLaboratorioAnterior);
+            LaboratorioClinico laboratorioNuevo =laboratorioClinicoService.obtenerPorId(idLaboratorioNuevo);
+
+            if (laboratorioAnterior == null ||laboratorioNuevo == null) {
+                return null;
+            }
+
+            String organizationAnterior = laboratorioAnterior.getClerkOrganizationId();
+            String organizationNueva = laboratorioNuevo.getClerkOrganizationId();
+
+            cambiarOrganizacionClerk(
+                    clerkUserId,
+                    organizationAnterior,
+                    organizationNueva
+            );
+        }
+
+
+        // =========================
+        // ACTUALIZAR BASE DE DATOS
+        // =========================
+
+        usuarioEncontrado.setNombre(userExtraccion.getNombre());
+        usuarioEncontrado.setApellido(userExtraccion.getApellido());
+        usuarioEncontrado.setRut(userExtraccion.getRut());
+        usuarioEncontrado.setEmail( userExtraccion.getEmail());
+        usuarioEncontrado.setProfesion(userExtraccion.getProfesion());
+        usuarioEncontrado.setUsername(userExtraccion.getUsername());
+        usuarioEncontrado.setTelefono(userExtraccion.getTelefono());
+        usuarioEncontrado.setIdLaboratorioClinico(userExtraccion.getIdLaboratorioClinico());
+        usuarioEncontrado.setIdTipoUsuarios( userExtraccion.getIdTipoUsuarios());
+        usuarioEncontrado.setUsuarioModificacionId(userExtraccion.getUsuarioModificacionId());
+
+        return repository.save(usuarioEncontrado);
+    }
 
 
     //+ registrarUltimoAcceso(idUsuarioLevey: Long): boolean
