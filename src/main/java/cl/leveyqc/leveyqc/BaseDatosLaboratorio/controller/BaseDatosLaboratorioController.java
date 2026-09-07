@@ -19,10 +19,39 @@ public class BaseDatosLaboratorioController {
 
     }
 
+
+    private void debugObject(BaseDatosLaboratorio o) {
+
+        if (o == null) {
+            System.out.println("========================================");
+            System.out.println("BaseDatosLaboratorio: NULL");
+            System.out.println("========================================");
+            return;
+        }
+
+        System.out.println("\n========== BaseDatosLaboratorio ==========");
+        System.out.println("idBaseDatosLaboratorio : " + o.getIdBaseDatosLaboratorio());
+        System.out.println("idLaboratorioClinico    : " + o.getIdLaboratorioClinico());
+        System.out.println("nombreBaseDatos         : " + o.getNombreBaseDatos());
+        System.out.println("motorBaseDatos          : " + o.getMotorBaseDatos());
+        System.out.println("hostReferencia          : " + o.getHostReferencia());
+        System.out.println("puertoReferencia        : " + o.getPuertoReferencia());
+        System.out.println("secretoConexionKey      : " + o.getSecretoConexionKey());
+        System.out.println("estadoConexion          : " + o.getEstadoConexion());
+        System.out.println("activo                  : " + o.getActivo());
+        System.out.println("fechaCreacion           : " + o.getFechaCreacion());
+        System.out.println("fechaModificacion       : " + o.getFechaModificacion());
+        System.out.println("usuarioCreacionId       : " + o.getUsuarioCreacionId());
+        System.out.println("usuarioModificacionId   : " + o.getUsuarioModificacionId());
+        System.out.println("===========================================\n");
+    }
+
+
 //+ crearBaseDatosLaboratorio(base: BaseDatosLaboratorio)
 // POST /bases-datos-laboratorio
     @PostMapping("/bases-datos-laboratorio")
     public ResponseEntity<DTO> crearBaseDatosLaboratorio (@RequestBody  BaseDatosLaboratorio nuevo){
+        debugObject(nuevo);
         DTO respuesta = new DTO();
         BaseDatosLaboratorio baseCreada = service.crearBaseDatosLaboratorio(nuevo);
 
@@ -44,7 +73,7 @@ public class BaseDatosLaboratorioController {
 @GetMapping("/bases-datos-laboratorio")
 public ResponseEntity<DTO> listarBasesDatosLaboratorio (){
     DTO respuesta = new DTO();
-    List<BaseDatosLaboratorio> listadoBaseDatos = service.listarBasesDatosLaboratorio();
+    List<Object[]> listadoBaseDatos = service.listarBasesDatosLaboratorio();
 
     if (listadoBaseDatos.isEmpty()){
         respuesta.setMessage("No se encontro listado");
@@ -59,9 +88,6 @@ public ResponseEntity<DTO> listarBasesDatosLaboratorio (){
         return ResponseEntity.status(HttpStatus.OK).body(respuesta);
     }
 }
-
-
-
 
 
 
@@ -116,6 +142,11 @@ public ResponseEntity<DTO> listarBasesDatosDisponibles (){
 //  GET /bases-datos-laboratorio/{idBaseDatosLaboratorio}
 @GetMapping("/bases-datos-laboratorio/{idBaseDatosLaboratorio}")
 public ResponseEntity<DTO> buscarBaseDatosPorId (@PathVariable Long idBaseDatosLaboratorio ){
+
+    System.out.println("========== DEBUG ==========");
+    System.out.println("numero = " + idBaseDatosLaboratorio);
+    System.out.println("===========================");
+
     DTO respuesta = new DTO();
     List<BaseDatosLaboratorio> listadoBaseDatos = service.buscarBaseDatosPorId(idBaseDatosLaboratorio);
 
@@ -140,6 +171,12 @@ public ResponseEntity<DTO> buscarBaseDatosPorId (@PathVariable Long idBaseDatosL
 //  GET /bases-datos-laboratorio/laboratorio/{idLaboratorioClinico}
 @GetMapping("/bases-datos-laboratorio/laboratorio/{idLaboratorioClinico}")
 public ResponseEntity<DTO> buscarBaseDatosPorLaboratorioClinico (@PathVariable Long idLaboratorioClinico ){
+
+    System.out.println("========== DEBUG ==========");
+    System.out.println("numero = " + idLaboratorioClinico);
+    System.out.println("===========================");
+
+
     DTO respuesta = new DTO();
     List<BaseDatosLaboratorio> listadoBaseDatos = service.buscarBaseDatosPorLaboratorioClinico(idLaboratorioClinico);
 
@@ -166,7 +203,7 @@ public ResponseEntity<DTO> buscarBaseDatosPorLaboratorioClinico (@PathVariable L
 
 @PutMapping("/bases-datos-laboratorio/laboratorio")
 public ResponseEntity<DTO> actualizarBaseDatosLaboratorio (@RequestBody BaseDatosLaboratorio baseActualizar ){
-
+        debugObject(baseActualizar);
         DTO respuesta = new DTO();
         BaseDatosLaboratorio  objetoActualizado = service.actualizarBaseDatosLaboratorio(baseActualizar);
 

@@ -20,12 +20,12 @@ private String motorBaseDatos;
 private String hostReferencia;
 private Integer puertoReferencia;
 private String secretoConexionKey;
-private String estadoConexion;
+private Integer estadoConexion;
 private Integer activo;
 private LocalDateTime fechaCreacion;
 private LocalDateTime fechaModificacion;
-private Long usuarioCreacionId;
-private Long usuarioModificacionId;
+private String usuarioCreacionId;
+private String usuarioModificacionId;
 
     public BaseDatosLaboratorio() {
     }
@@ -37,12 +37,13 @@ private Long usuarioModificacionId;
         if(fechaCreacion == null){
             this.fechaCreacion = fecha;
         }
-        if(fechaModificacion == null){
-            this.fechaModificacion = fecha;
-        }
 
         if (activo == null){
             this.activo = 1;
+        }
+
+        if (estadoConexion==null){
+            this.estadoConexion=1;
         }
     }
 

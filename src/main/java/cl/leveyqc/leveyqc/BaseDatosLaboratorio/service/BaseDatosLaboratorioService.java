@@ -43,14 +43,12 @@ BaseDatosLaboratorio
     public BaseDatosLaboratorio crearBaseDatosLaboratorio(BaseDatosLaboratorio base) {
         try {
             if (base == null) return null;
-            if (base.getIdBaseDatosLaboratorio() != null) return null;
             if (base.getIdLaboratorioClinico() == null) return null;
             if (base.getNombreBaseDatos() == null) return null;
             if (base.getMotorBaseDatos() == null) return null;
             if (base.getHostReferencia() == null) return null;
             if (base.getPuertoReferencia() == null) return null;
             if (base.getSecretoConexionKey() == null) return null;
-            if (base.getEstadoConexion() == null) return null;
             if (base.getUsuarioCreacionId() == null) return null;
 
             return repository.save(base);
@@ -64,9 +62,9 @@ BaseDatosLaboratorio
 
 
     //+ listarBasesDatosLaboratorio(): List<BaseDatosLaboratorioResponseDTO>
-    public List<BaseDatosLaboratorio> listarBasesDatosLaboratorio(){
+    public List<Object[]> listarBasesDatosLaboratorio(){
         try {
-           return repository.findAll();
+           return repository.findListaLaboratoriosBaseDatosTodos();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -162,8 +160,6 @@ BaseDatosLaboratorio
         if(base.getHostReferencia()== null) return null;
         if(base.getPuertoReferencia()== null) return null;
         if(base.getSecretoConexionKey()== null) return null;
-        if(base.getEstadoConexion()== null) return null;
-        if(base.getActivo()== null) return null;
         if(base.getUsuarioModificacionId()== null) return null;
 
         Optional<BaseDatosLaboratorio> objetoBuscado = repository.findById(base.getIdBaseDatosLaboratorio());
@@ -177,10 +173,7 @@ BaseDatosLaboratorio
             objetoEncontrado.setHostReferencia(base.getHostReferencia());
             objetoEncontrado.setPuertoReferencia(base.getPuertoReferencia());
             objetoEncontrado.setSecretoConexionKey(base.getSecretoConexionKey());
-            objetoEncontrado.setEstadoConexion(base.getEstadoConexion());
-            objetoEncontrado.setActivo(base.getActivo());
             objetoEncontrado.setUsuarioModificacionId(base.getUsuarioModificacionId());
-
             return repository.save(objetoEncontrado);
         }else {
             return null;
@@ -221,7 +214,7 @@ BaseDatosLaboratorio
 
         if ((baseDatosBuscada.isPresent())){
             baseEncontrada = baseDatosBuscada.get();
-            baseEncontrada.setEstadoConexion("conectada");
+            baseEncontrada.setEstadoConexion(1);
             return repository.save(baseEncontrada);
         }else{
             return null;
@@ -239,7 +232,7 @@ BaseDatosLaboratorio
 
         if ((baseDatosBuscada.isPresent())) {
             baseEncontrada = baseDatosBuscada.get();
-            baseEncontrada.setEstadoConexion("desconectada");
+            baseEncontrada.setEstadoConexion(0);
             return repository.save(baseEncontrada);
         } else {
             return null;
