@@ -183,12 +183,15 @@ public class UsuariosLeveyService {
 
 
     //+ buscarUsuarioPorClerkUserId(clerkUserId: String): List<UsuariosLevey>
-    public List<UsuariosLevey> buscarUsuarioPorClerkUserId(String clerkUserId){
-        List<UsuariosLevey> listadoCoincidencias = repository.findByClerkUserId(clerkUserId);
-        if (listadoCoincidencias.isEmpty()){
-            return Collections.emptyList();
+    public UsuariosLevey buscarUsuarioPorClerkUserId(String clerkUserId){
+        Optional<UsuariosLevey> buscado = repository.findByClerkUserId(clerkUserId);
+        UsuariosLevey encontrado;
+
+        if (buscado.isPresent()){
+            encontrado=buscado.get();
+            return encontrado;
         }else{
-            return listadoCoincidencias;
+            return null;
         }
     }
 

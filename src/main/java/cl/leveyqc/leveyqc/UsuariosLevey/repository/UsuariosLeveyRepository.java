@@ -8,8 +8,9 @@ import java.util.Optional;
 
 public interface UsuariosLeveyRepository extends JpaRepository <UsuariosLevey, Long> {
     List<UsuariosLevey> findByEstadoUsuario(Integer estadoUsuario);
-    List<UsuariosLevey> findByClerkUserId(String clerkUserId);
     List<UsuariosLevey> findByEmail(String email);
+    Optional<UsuariosLevey> findByClerkUserId(String clerkUserId);
+
 
     @Query("""
 SELECT

@@ -1,6 +1,5 @@
 package cl.leveyqc.leveyqc.Seguridad;
-
-import cl.leveyqc.leveyqc.AdministradoresUsuarios.service.AdministradorUsuarioService;
+import cl.leveyqc.leveyqc.Seguridad.identidad.ResolutorActorService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -20,17 +19,40 @@ import java.util.List;
 @EnableWebSecurity
 public class ConfiguracionSeguridad {
 
-    private final AdministradorUsuarioService service;
+    private final ResolutorActorService resolutorActorService;
 
-    public ConfiguracionSeguridad(AdministradorUsuarioService service) {
-        this.service = service;
+    public ConfiguracionSeguridad(ResolutorActorService resolutorActorService) {
+        this.resolutorActorService = resolutorActorService;
     }
 
     @Bean
     public SecurityFilterChain cadenaDeSeguridad(HttpSecurity http) throws Exception{
         http.authorizeHttpRequests(autenticacion->autenticacion
-                .requestMatchers("/").permitAll()
-                .requestMatchers("/laboratorios-clinicos").permitAll()
+
+                .requestMatchers("/")
+                .permitAll()
+
+                .requestMatchers("/auth/me")
+                .hasAnyRole("ADMIN", "USUARIO_LEVEY")
+
+                .requestMatchers(
+                        "/asignacion-permisos",
+                        "/asignacion-permisos/**",
+                        "/bases-datos-laboratorio",
+                        "/bases-datos-laboratorio/**",
+                        "/laboratorios-clinicos",
+                        "/laboratorios-clinicos/**",
+                        "/permiso",
+                        "/permiso/**",
+                        "/tipos-usuarios",
+                        "/tipos-usuarios/**",
+                        "/usuarios-levey",
+                        "/usuarios-levey/**"
+
+                )
+
+                .hasRole("ADMIN")
+
                 .anyRequest().authenticated());
 
         http.sessionManagement(sesion->sesion
@@ -43,14 +65,13 @@ public class ConfiguracionSeguridad {
         http.csrf(csrf->csrf.disable());
 
         http.cors(Customizer.withDefaults());
-        FiltroAdministradorActivo filtroAdministradorActivo =
-                new FiltroAdministradorActivo(service);
+        FiltroUsuariosSistema filtroUsuariosSistema =
+                new FiltroUsuariosSistema(resolutorActorService);
 
         http.addFilterAfter(
-                filtroAdministradorActivo,
+                filtroUsuariosSistema,
                 BearerTokenAuthenticationFilter.class
         );
-
 
         return http.build();
     }

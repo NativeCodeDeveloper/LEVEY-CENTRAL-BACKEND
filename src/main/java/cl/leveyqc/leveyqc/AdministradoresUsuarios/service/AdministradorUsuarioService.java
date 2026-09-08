@@ -41,6 +41,7 @@ public class AdministradorUsuarioService {
        return repository.existsByClerkUserId(clerkUserId);
     }
 
+
     //- Buscar administrador por clerkUserId.
     public AdministradoresUsuarios buscarPorClerkUserId(String clerkUserId){
         if (clerkUserId == null)return null;
@@ -122,6 +123,9 @@ public class AdministradorUsuarioService {
             return null;
         }
     }
+
+
+
 
 }
 

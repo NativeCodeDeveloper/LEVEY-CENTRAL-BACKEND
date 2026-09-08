@@ -152,8 +152,8 @@ public ResponseEntity<DTO> buscarUsuarioPorId(@PathVariable Long idUsuarioLevey)
 @GetMapping("/usuarios-levey/clerk/{clerkUserId}")
 public ResponseEntity<DTO> buscarUsuarioPorClerkUserId(@PathVariable String clerkUserId){
     DTO respuesta = new DTO();
-    List<UsuariosLevey> usuariosEncontrados =  service.buscarUsuarioPorClerkUserId(clerkUserId);
-    if (usuariosEncontrados.isEmpty()){
+    UsuariosLevey usuariosEncontrados =  service.buscarUsuarioPorClerkUserId(clerkUserId);
+    if (usuariosEncontrados == null){
         respuesta.setMessage("No se encontro usuario buscado en los registros");
         respuesta.setSuccess(false);
         respuesta.setData(null);
