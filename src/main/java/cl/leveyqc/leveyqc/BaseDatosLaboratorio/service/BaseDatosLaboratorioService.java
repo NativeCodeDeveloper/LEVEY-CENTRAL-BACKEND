@@ -1,4 +1,5 @@
 package cl.leveyqc.leveyqc.BaseDatosLaboratorio.service;
+import cl.leveyqc.leveyqc.BaseDatosLaboratorio.conexion.RegistroPoolsLaboratorio;
 import cl.leveyqc.leveyqc.BaseDatosLaboratorio.model.BaseDatosLaboratorio;
 import cl.leveyqc.leveyqc.BaseDatosLaboratorio.repository.BaseDatosLaboratorioRepository;
 import cl.leveyqc.leveyqc.LaboratorioClinico.model.LaboratorioClinico;
@@ -14,8 +15,14 @@ import java.util.Optional;
 public class BaseDatosLaboratorioService {
 
     private final BaseDatosLaboratorioRepository repository;
-    public BaseDatosLaboratorioService(BaseDatosLaboratorioRepository repository) {
+    private final RegistroPoolsLaboratorio registroPools;
+
+    public BaseDatosLaboratorioService(
+            BaseDatosLaboratorioRepository repository,
+            RegistroPoolsLaboratorio registroPools
+    ) {
         this.repository = repository;
+        this.registroPools = registroPools;
     }
 
 
@@ -44,6 +51,7 @@ BaseDatosLaboratorio
         try {
             if (base == null) return null;
             if (base.getIdLaboratorioClinico() == null) return null;
+            if (base.getUsuarioConexion() == null) return null;
             if (base.getNombreBaseDatos() == null) return null;
             if (base.getMotorBaseDatos() == null) return null;
             if (base.getHostReferencia() == null) return null;
@@ -115,18 +123,16 @@ try {
 
 
 
+
+
     //+ buscarBaseDatosPorLaboratorioClinico(idLaboratorioClinico: Long): List<LaboratorioClinico>
-    public List<BaseDatosLaboratorio> buscarBaseDatosPorLaboratorioClinico(Long idLaboratorioClinico){
+    public BaseDatosLaboratorio buscarBasePorLaboratorioClinico(Long idLaboratorioClinico){
         if(idLaboratorioClinico == null){
-            return Collections.emptyList();
+            return null;
         }else{
             return repository.findByIdLaboratorioClinico(idLaboratorioClinico);
         }
     }
-
-
-
-
 
 
 
@@ -160,6 +166,7 @@ BaseDatosLaboratorio
         if(base.getHostReferencia()== null) return null;
         if(base.getPuertoReferencia()== null) return null;
         if(base.getSecretoConexionKey()== null) return null;
+        if(base.getUsuarioConexion()== null) return null;
         if(base.getUsuarioModificacionId()== null) return null;
 
         Optional<BaseDatosLaboratorio> objetoBuscado = repository.findById(base.getIdBaseDatosLaboratorio());
@@ -167,14 +174,18 @@ BaseDatosLaboratorio
 
         if (objetoBuscado.isPresent()){
             objetoEncontrado = objetoBuscado.get();
+            Long laboratorioAnterior = objetoEncontrado.getIdLaboratorioClinico();
             objetoEncontrado.setIdLaboratorioClinico(base.getIdLaboratorioClinico());
             objetoEncontrado.setNombreBaseDatos(base.getNombreBaseDatos());
             objetoEncontrado.setMotorBaseDatos(base.getMotorBaseDatos());
             objetoEncontrado.setHostReferencia(base.getHostReferencia());
             objetoEncontrado.setPuertoReferencia(base.getPuertoReferencia());
             objetoEncontrado.setSecretoConexionKey(base.getSecretoConexionKey());
+            objetoEncontrado.setUsuarioConexion(base.getUsuarioConexion());
             objetoEncontrado.setUsuarioModificacionId(base.getUsuarioModificacionId());
-            return repository.save(objetoEncontrado);
+            BaseDatosLaboratorio actualizado = repository.save(objetoEncontrado);
+            invalidarPools(laboratorioAnterior, actualizado.getIdLaboratorioClinico());
+            return actualizado;
         }else {
             return null;
         }
@@ -193,8 +204,11 @@ BaseDatosLaboratorio
 
         if (baseBuscada.isPresent()){
             baseEncontrada = baseBuscada.get();
+            Long laboratorioAnterior = baseEncontrada.getIdLaboratorioClinico();
             baseEncontrada.setIdLaboratorioClinico(idLaboratorioClinico);
-            return repository.save(baseEncontrada);
+            BaseDatosLaboratorio actualizada = repository.save(baseEncontrada);
+            invalidarPools(laboratorioAnterior, idLaboratorioClinico);
+            return actualizada;
         }else{
             return null;
         }
@@ -215,7 +229,9 @@ BaseDatosLaboratorio
         if ((baseDatosBuscada.isPresent())){
             baseEncontrada = baseDatosBuscada.get();
             baseEncontrada.setEstadoConexion(1);
-            return repository.save(baseEncontrada);
+            BaseDatosLaboratorio actualizada = repository.save(baseEncontrada);
+            registroPools.invalidarPool(actualizada.getIdLaboratorioClinico());
+            return actualizada;
         }else{
             return null;
         }
@@ -233,7 +249,9 @@ BaseDatosLaboratorio
         if ((baseDatosBuscada.isPresent())) {
             baseEncontrada = baseDatosBuscada.get();
             baseEncontrada.setEstadoConexion(0);
-            return repository.save(baseEncontrada);
+            BaseDatosLaboratorio actualizada = repository.save(baseEncontrada);
+            registroPools.invalidarPool(actualizada.getIdLaboratorioClinico());
+            return actualizada;
         } else {
             return null;
         }
@@ -251,7 +269,9 @@ BaseDatosLaboratorio
         if ((baseDatosBuscada.isPresent())) {
             baseEncontrada = baseDatosBuscada.get();
             baseEncontrada.setActivo(1);
-            return repository.save(baseEncontrada);
+            BaseDatosLaboratorio actualizada = repository.save(baseEncontrada);
+            registroPools.invalidarPool(actualizada.getIdLaboratorioClinico());
+            return actualizada;
         } else {
             return null;
         }
@@ -268,16 +288,26 @@ BaseDatosLaboratorio
        if ((baseDatosBuscada.isPresent())) {
            baseEncontrada = baseDatosBuscada.get();
            baseEncontrada.setActivo(0);
-           return repository.save(baseEncontrada);
+           BaseDatosLaboratorio actualizada = repository.save(baseEncontrada);
+           registroPools.invalidarPool(actualizada.getIdLaboratorioClinico());
+           return actualizada;
        } else {
            return null;
        }
    }
 
+    private void invalidarPools(Long laboratorioAnterior, Long laboratorioActual) {
+        if (laboratorioAnterior != null) {
+            registroPools.invalidarPool(laboratorioAnterior);
+        }
+
+        if (laboratorioActual != null && !laboratorioActual.equals(laboratorioAnterior)) {
+            registroPools.invalidarPool(laboratorioActual);
+        }
+    }
 
 
 }
-
 
 
 

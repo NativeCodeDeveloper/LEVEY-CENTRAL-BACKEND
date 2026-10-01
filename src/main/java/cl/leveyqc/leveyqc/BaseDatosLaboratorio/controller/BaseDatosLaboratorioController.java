@@ -167,36 +167,6 @@ public ResponseEntity<DTO> buscarBaseDatosPorId (@PathVariable Long idBaseDatosL
 
 
 
-//+ buscarBaseDatosPorLaboratorioClinico(idLaboratorioClinico: Long)
-//  GET /bases-datos-laboratorio/laboratorio/{idLaboratorioClinico}
-@GetMapping("/bases-datos-laboratorio/laboratorio/{idLaboratorioClinico}")
-public ResponseEntity<DTO> buscarBaseDatosPorLaboratorioClinico (@PathVariable Long idLaboratorioClinico ){
-
-    System.out.println("========== DEBUG ==========");
-    System.out.println("numero = " + idLaboratorioClinico);
-    System.out.println("===========================");
-
-
-    DTO respuesta = new DTO();
-    List<BaseDatosLaboratorio> listadoBaseDatos = service.buscarBaseDatosPorLaboratorioClinico(idLaboratorioClinico);
-
-    if (listadoBaseDatos.isEmpty()){
-        respuesta.setMessage("No se encontro ningun elemento coincidente con el laboratorio");
-        respuesta.setSuccess(false);
-        respuesta.setData(null);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
-
-    }else{
-        respuesta.setMessage("Listado encontrado para el laboratorio señalado");
-        respuesta.setSuccess(true);
-        respuesta.setData(listadoBaseDatos);
-        return ResponseEntity.status(HttpStatus.OK).body(respuesta);
-    }
-}
-
-
-
-
 
 //+ actualizarBaseDatosLaboratorio(base: BaseDatosLaboratorio)
 //  PUT /bases-datos-laboratorio/actualizar

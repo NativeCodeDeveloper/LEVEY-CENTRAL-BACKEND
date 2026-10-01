@@ -23,7 +23,7 @@ public class ResolutorActorService {
 
     private boolean administradorSistema(String clerkUserId){
         AdministradoresUsuarios adminBuscado = adminServices.buscarPorClerkUserId(clerkUserId);
-        if (adminBuscado ==null){
+        if (adminBuscado == null){
             return false;
         }else{
             return true;

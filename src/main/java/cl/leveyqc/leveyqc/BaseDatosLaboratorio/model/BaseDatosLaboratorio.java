@@ -26,6 +26,7 @@ private LocalDateTime fechaCreacion;
 private LocalDateTime fechaModificacion;
 private String usuarioCreacionId;
 private String usuarioModificacionId;
+private String usuarioConexion;
 
     public BaseDatosLaboratorio() {
     }

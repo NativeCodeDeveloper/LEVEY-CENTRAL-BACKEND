@@ -13,7 +13,7 @@ public interface BaseDatosLaboratorioRepository extends JpaRepository<BaseDatosL
 
     List<BaseDatosLaboratorio> findByIdBaseDatosLaboratorio(Long idBaseDatosLaboratorio);
 
-    List<BaseDatosLaboratorio> findByIdLaboratorioClinico(Long idLaboratorioClinico);
+    BaseDatosLaboratorio findByIdLaboratorioClinico(Long idLaboratorioClinico);
 
     @Query("""
 SELECT

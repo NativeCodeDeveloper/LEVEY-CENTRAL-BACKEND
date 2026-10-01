@@ -36,6 +36,13 @@ public class ConfiguracionSeguridad {
                 .hasAnyRole("ADMIN", "USUARIO_LEVEY")
 
                 .requestMatchers(
+                        "/prueba-pool",
+                        "/informacionlaboratorio",
+                        "/informacionlaboratorio/**"
+                )
+                .hasRole("USUARIO_LEVEY")
+
+                .requestMatchers(
                         "/asignacion-permisos",
                         "/asignacion-permisos/**",
                         "/bases-datos-laboratorio",
