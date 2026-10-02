@@ -213,4 +213,31 @@ public class AnalitosController {
         }
     }
 
+
+
+
+
+    @GetMapping("/analitos/activos")
+    public ResponseEntity<DTO>  listarActivos(){
+        System.out.println("PETICION GET analitos activos solamente DE analitos INGRESA CORRECTAMENTE");
+        DTO respuesta = new DTO();
+
+        List<Object[]> respuestaService = service.analitosActivos();
+
+        if (respuestaService.isEmpty()){
+            respuesta.setSuccess(false);
+            respuesta.setMessage("El listado se encuentra sin datos.");
+            respuesta.setData(respuestaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }else{
+            respuesta.setSuccess(true);
+            respuesta.setMessage("Listado de datos encontrados.");
+            respuesta.setData(respuestaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }
+    }
+
+
+
+
 }

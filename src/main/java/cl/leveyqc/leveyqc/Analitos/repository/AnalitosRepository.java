@@ -95,8 +95,32 @@ LIKE LOWER(CONCAT('%', :texto, '%'))
     List<Object[]> findTodosAnalitos(@Param("texto") String texto);
 
 
-    //ENCONTRAR LISTADO DE ANALITOS ESPECIFICOS QUE ESTEN ACTIVOS
+    //ENCONTRAR LISTADO DE ANALITOS  QUE ESTEN ACTIVOS
+    @Query("""
+   SELECT
+    categorias.nombreCategoria,
+    unidadesDeMedida.unidadDeMedida,
+    matriz.nombreMatriz,
+    analitos.idAnalito,
+    analitos.nombreAnalito,
+    analitos.abreviacion,
+    analitos.activo
 
+    FROM Analitos analitos
+
+    INNER JOIN Categorias categorias
+    ON categorias.idCategoria = analitos.idCategoria
+
+    INNER JOIN UnidadesDeMedida unidadesDeMedida
+    ON unidadesDeMedida.idUnidadesDeMedida = analitos.unidadMedidaId
+
+    INNER JOIN Matriz matriz
+    ON matriz.idMatriz = analitos.idMatriz
+    
+    WHERE  analitos.activo = 1
+"""
+    )
+    List<Object[]> listarAnalitosActivos();
 
     //ENCONTRAR LISTADO DE ANALITOS PERO SOLAMENTE LOS ACTIVOS
 }

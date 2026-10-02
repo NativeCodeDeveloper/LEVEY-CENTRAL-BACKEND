@@ -155,9 +155,6 @@ public class AnalitosService {
 
 
 
-
-
-
     public List<Object[]> buscarSimilares(String nombreAnalito) {
         if (nombreAnalito == null) {
             return null;
@@ -172,6 +169,11 @@ public class AnalitosService {
             return null;
         }
         return repository.findAnalitosPorCategoria(idCategoria);
+    }
+
+
+    public List<Object[]> analitosActivos() {
+        return repository.listarAnalitosActivos();
     }
 
 

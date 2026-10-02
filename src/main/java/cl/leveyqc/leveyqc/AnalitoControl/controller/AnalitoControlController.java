@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.sound.midi.Soundbank;
 import java.sql.SQLOutput;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 public class AnalitoControlController{
@@ -91,4 +93,158 @@ public class AnalitoControlController{
             return ResponseEntity.status(HttpStatus.OK).body(respuesta);
         }
     }
+
+
+
+    @GetMapping("/analitoControl/niveles/listarTodos")
+    public ResponseEntity<DTO> listarAnalitosyNiveles(){
+        System.out.println("SE RECIBE ENDPOIT DE LISTAR NIVELES");
+        DTO respuesta = new DTO();
+        List<Object[]> respeustaService = service.listarNivelesyAnalitosControl();
+        if(respeustaService.isEmpty()){
+            respuesta.setSuccess(false);
+            respuesta.setMessage("No se encontraron analitos o niveles registrados");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }else {
+            respuesta.setSuccess(true);
+            respuesta.setMessage("Listado de analitos y niveles encontrados");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }
+    }
+
+
+
+
+
+    @GetMapping("/analitoControl/niveles/activos")
+    public ResponseEntity<DTO> listarNivelesActivos(){
+        System.out.println("SE RECIBE ENDPOIT DE LISTAR NIVELES ACTIVOS");
+        DTO respuesta = new DTO();
+        List<Object[]> respeustaService = service.listarAnalitosNivelesActivos();
+        if(respeustaService.isEmpty()){
+            respuesta.setSuccess(false);
+            respuesta.setMessage("No se encontraron analitos activos");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }else {
+            respuesta.setSuccess(true);
+            respuesta.setMessage("Listado de analitos activos encontrados");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }
+    }
+
+
+
+
+
+
+    @GetMapping("/analitoControl/niveles/inactivos")
+    public ResponseEntity<DTO> listarNivelesInactivos(){
+        System.out.println("SE RECIBE ENDPOIT DE LISTAR NIVELES INACTIVOS");
+        DTO respuesta = new DTO();
+        List<Object[]> respeustaService = service.listarAnalitosNivelesIncativos();
+        if(respeustaService.isEmpty()){
+            respuesta.setSuccess(false);
+            respuesta.setMessage("No se encontraron analitos inactivos");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }else {
+            respuesta.setSuccess(true);
+            respuesta.setMessage("Listado de analitos inactivos encontrados");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }
+    }
+
+
+
+
+    @GetMapping("/analitoControl/niveles/lotes/{numeroLote}")
+    public ResponseEntity<DTO> listarPorLoteSimilar(@PathVariable String numeroLote){
+        System.out.println("SE RECIBE ENDPOIT DE LISTAR POR NUMERO DE LOTES");
+        DTO respuesta = new DTO();
+        List<Object[]> respeustaService = service.listarLoteSimilar(numeroLote);
+        if(respeustaService.isEmpty()){
+            respuesta.setSuccess(false);
+            respuesta.setMessage("No se encontraron analitos para el lote indicado");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }else {
+            respuesta.setSuccess(true);
+            respuesta.setMessage("Listado de analitos encontrados para el lote buscado");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }
+    }
+
+
+
+
+    @GetMapping("/analitoControl/niveles/{nombreControl}")
+    public ResponseEntity<DTO> listarPorSimilitudDeNombre(@PathVariable String nombreControl){
+        System.out.println("SE RECIBE ENDPOIT DE LISTAR POR NUMERO DE LOTES");
+        DTO respuesta = new DTO();
+        List<Object[]> respeustaService = service.listarNombreControlesSimilares(nombreControl);
+        if(respeustaService.isEmpty()){
+            respuesta.setSuccess(false);
+            respuesta.setMessage("No se encontraron analitos para el control buscado");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }else {
+            respuesta.setSuccess(true);
+            respuesta.setMessage("Listado de analitos encontrados para el control buscado");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }
+    }
+
+
+
+
+
+    @GetMapping("/analitoControl/analitos/{idAnalito}")
+    public ResponseEntity<DTO> listarPorSimilitudDeNombre(@PathVariable Long idAnalito){
+        System.out.println("SE RECIBE ENDPOIT DE LISTAR POR NUMERO DE LOTES");
+        DTO respuesta = new DTO();
+        List<Object[]> respeustaService = service.listarPorAnalitosObject(idAnalito);
+        if(respeustaService.isEmpty()){
+            respuesta.setSuccess(false);
+            respuesta.setMessage("No se encontraron analitos para el control buscado");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }else {
+            respuesta.setSuccess(true);
+            respuesta.setMessage("Listado de analitos encontrados para el control buscado");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }
+    }
+
+
+
+
+    @GetMapping("/analitoControl/fechas")
+    public ResponseEntity<DTO> buscarEntreFechas(
+            @RequestParam LocalDateTime fechaInicio,
+            @RequestParam LocalDateTime fechaFin
+    ){
+        System.out.println("SE RECIBE ENDPOIT DE LISTAR POR NUMERO DE LOTES");
+        DTO respuesta = new DTO();
+        List<Object[]> respeustaService = service.buscarEntreFechas(fechaInicio,fechaFin);
+        if(respeustaService.isEmpty()){
+            respuesta.setSuccess(false);
+            respuesta.setMessage("No se encontraron analitos para el control buscado");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }else {
+            respuesta.setSuccess(true);
+            respuesta.setMessage("Listado de analitos encontrados para el control buscado");
+            respuesta.setData(respeustaService);
+            return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+        }
+    }
+
 }

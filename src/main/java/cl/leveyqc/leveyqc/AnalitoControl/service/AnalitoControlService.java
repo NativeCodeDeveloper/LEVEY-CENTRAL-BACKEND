@@ -8,6 +8,9 @@ import cl.leveyqc.leveyqc.NivelesAnalitosControl.service.NivelesAnalitosControlS
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -66,12 +69,10 @@ public class AnalitoControlService {
         return  true;
     }
 
-
     public boolean eliminarAnalitoControl(Long idAnalitoControl){
         if (idAnalitoControl==null){
             return false;
         }
-
         Optional<AnalitoControl> analitoBuscado = AnalitosControlrepository.findById(idAnalitoControl);
         AnalitoControl encontrado;
         if (analitoBuscado.isPresent()){
@@ -82,5 +83,36 @@ public class AnalitoControlService {
         }else{
             return  false;
         }
+    }
+
+    public List<Object[]> listarNivelesyAnalitosControl(){
+        return AnalitosControlrepository.ListarAnalitosyNivelesTodos();
+    }
+
+    public List<Object[]> listarAnalitosNivelesActivos(){
+        return AnalitosControlrepository.listarSoloActivos();
+    }
+
+    public List<Object[]> listarAnalitosNivelesIncativos(){
+        return AnalitosControlrepository.listarSoloInactivos();
+    }
+
+    public List<Object[]> listarLoteSimilar(String numeroLote){
+        return AnalitosControlrepository.buscarPorLoteSimilar(numeroLote);
+    }
+
+    public List<Object[]> listarNombreControlesSimilares(String nombreControl){
+        return AnalitosControlrepository.buscarPorNombreControl(nombreControl);
+    }
+
+    public List<Object[]> listarPorAnalitosObject(Long idAnalito){
+        return AnalitosControlrepository.buscarPorAnalitoTecnica(idAnalito);
+    }
+
+    public List<Object[]> buscarEntreFechas(
+            LocalDateTime fechaInicio,
+            LocalDateTime fechaFin
+    ){
+        return AnalitosControlrepository.buscarEntreFechas(fechaInicio,fechaFin);
     }
 }
