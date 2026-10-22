@@ -26,7 +26,11 @@ SELECT
     a.nombreAnalito AS NOMBREANALITO,
     c.numeroLote AS LOTE,
     c.activo AS ESTADOCONTROL,
-    c.fechaCreacion AS FECHA
+    c.fechaCreacion AS FECHA,
+    nac.mediaObjetivo AS MEDIAOBJETIVO,
+    nac.desviacionEstandarObjetivo AS DESVESTANDAROBJ
+    
+    
 
     FROM NivelesAnalitosControl nac
 
@@ -63,7 +67,9 @@ SELECT
     a.nombreAnalito AS NOMBREANALITO,
     c.numeroLote AS LOTE,
     c.activo AS ESTADOCONTROL,
-    c.fechaCreacion AS FECHA
+    c.fechaCreacion AS FECHA,
+    nac.mediaObjetivo AS MEDIAOBJETIVO,
+    nac.desviacionEstandarObjetivo AS DESVESTANDAROBJ
 
     FROM NivelesAnalitosControl nac
 
@@ -104,7 +110,9 @@ SELECT
     a.nombreAnalito AS NOMBREANALITO,
     c.numeroLote AS LOTE,
     c.activo AS ESTADOCONTROL,
-    c.fechaCreacion AS FECHA
+    c.fechaCreacion AS FECHA,
+    nac.mediaObjetivo AS MEDIAOBJETIVO,
+    nac.desviacionEstandarObjetivo AS DESVESTANDAROBJ
 
     FROM NivelesAnalitosControl nac
 
@@ -147,7 +155,9 @@ SELECT
     a.nombreAnalito AS NOMBREANALITO,
     c.numeroLote AS LOTE,
     c.activo AS ESTADOCONTROL,
-    c.fechaCreacion AS FECHA
+    c.fechaCreacion AS FECHA,
+    nac.mediaObjetivo AS MEDIAOBJETIVO,
+    nac.desviacionEstandarObjetivo AS DESVESTANDAROBJ
 
     FROM NivelesAnalitosControl nac
 
@@ -186,7 +196,9 @@ SELECT
     a.nombreAnalito AS NOMBREANALITO,
     c.numeroLote AS LOTE,
     c.activo AS ESTADOCONTROL,
-    c.fechaCreacion AS FECHA
+    c.fechaCreacion AS FECHA,
+    nac.mediaObjetivo AS MEDIAOBJETIVO,
+    nac.desviacionEstandarObjetivo AS DESVESTANDAROBJ
 
     FROM NivelesAnalitosControl nac
 
@@ -227,7 +239,9 @@ SELECT
     a.nombreAnalito AS NOMBREANALITO,
     c.numeroLote AS LOTE,
     c.activo AS ESTADOCONTROL,
-    c.fechaCreacion AS FECHA
+    c.fechaCreacion AS FECHA,
+    nac.mediaObjetivo AS MEDIAOBJETIVO,
+    nac.desviacionEstandarObjetivo AS DESVESTANDAROBJ
 
     FROM NivelesAnalitosControl nac
 
@@ -266,7 +280,9 @@ SELECT
     a.nombreAnalito AS NOMBREANALITO,
     c.numeroLote AS LOTE,
     c.activo AS ESTADOCONTROL,
-    c.fechaCreacion AS FECHA
+    c.fechaCreacion AS FECHA,
+    nac.mediaObjetivo AS MEDIAOBJETIVO,
+    nac.desviacionEstandarObjetivo AS DESVESTANDAROBJ
 
 FROM NivelesAnalitosControl nac
 

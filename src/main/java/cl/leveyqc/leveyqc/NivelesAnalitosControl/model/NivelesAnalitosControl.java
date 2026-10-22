@@ -1,12 +1,11 @@
 package cl.leveyqc.leveyqc.NivelesAnalitosControl.model;
 
 import cl.leveyqc.leveyqc.Auditoria.model.EntidadAuditableLevey;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 @Entity
 @Setter
@@ -17,4 +16,10 @@ public class NivelesAnalitosControl extends EntidadAuditableLevey {
     private Long idNivelesAnalitosControl;
     private Long idAnalitoAsignado;
     private String nombreNivel;
+
+    @Column(precision =  18, scale = 8)
+    private BigDecimal mediaObjetivo;
+
+    @Column(precision =  18, scale = 8)
+    private BigDecimal desviacionEstandarObjetivo;
 }

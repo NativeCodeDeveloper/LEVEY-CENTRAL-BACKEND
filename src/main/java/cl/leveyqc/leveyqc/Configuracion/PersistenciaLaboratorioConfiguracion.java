@@ -1,5 +1,4 @@
 package cl.leveyqc.leveyqc.Configuracion;
-
 import cl.leveyqc.leveyqc.AccionesCorrectivas.model.AccionesCorrectivas;
 import cl.leveyqc.leveyqc.AccionesCorrectivas.repository.AccionesCorrectivasRepository;
 import cl.leveyqc.leveyqc.AnalitoControl.model.AnalitoControl;
@@ -7,21 +6,29 @@ import cl.leveyqc.leveyqc.AnalitoControl.repository.AnalitoControlRepository;
 import cl.leveyqc.leveyqc.BaseDatosLaboratorio.conexion.GestorPoolLaboratorio;
 import cl.leveyqc.leveyqc.BaseDatosLaboratorio.hibernate.LaboratorioMultiTenantConnectionProvider;
 import cl.leveyqc.leveyqc.BaseDatosLaboratorio.hibernate.LaboratorioTenantIdentifierResolver;
-
+import cl.leveyqc.leveyqc.Calibradores.model.Calibradores;
+import cl.leveyqc.leveyqc.Calibradores.repository.CalibradoresRepository;
 import cl.leveyqc.leveyqc.Categorias.model.Categorias;
 import cl.leveyqc.leveyqc.Categorias.repository.CategoriasRepository;
 import cl.leveyqc.leveyqc.Controles.model.Controles;
 import cl.leveyqc.leveyqc.Controles.repository.ControlesRepository;
+import cl.leveyqc.leveyqc.CorridaAnalitica.model.CorridaAnalitica;
+import cl.leveyqc.leveyqc.CorridaAnalitica.repository.CorridaAnaliticaRepository;
 import cl.leveyqc.leveyqc.Matriz.model.Matriz;
 import cl.leveyqc.leveyqc.Analitos.model.Analitos;
 import cl.leveyqc.leveyqc.Analitos.repository.AnalitosRepository;
 
 import cl.leveyqc.leveyqc.InfomracionLaboratorio.model.InformacionLaboratorio;
 import cl.leveyqc.leveyqc.InfomracionLaboratorio.repository.InformacionLaboratorioRepository;
+import cl.leveyqc.leveyqc.MedicionesNivelesAnalitos.model.MedicionesNivelesAnalitos;
+import cl.leveyqc.leveyqc.MedicionesNivelesAnalitos.repository.MedicionesNivelesAnalitosRepository;
 import cl.leveyqc.leveyqc.NivelesAnalitosControl.model.NivelesAnalitosControl;
 import cl.leveyqc.leveyqc.NivelesAnalitosControl.repository.NivelesAnalitosControlRepository;
 import cl.leveyqc.leveyqc.Proveedores.model.Proveedores;
 import cl.leveyqc.leveyqc.Proveedores.repository.ProveedoresRepository;
+import cl.leveyqc.leveyqc.ReglasDeWestgard.model.ReglasDeWestgard;
+import cl.leveyqc.leveyqc.ReglasDeWestgard.repository.ReglasDeWestgardRepository;
+import cl.leveyqc.leveyqc.ReglasDeWestgard.service.ReglasDeWestgardService;
 import cl.leveyqc.leveyqc.Ubicaciones.model.Ubicaciones;
 import cl.leveyqc.leveyqc.Ubicaciones.repository.UbicacionesRepository;
 import cl.leveyqc.leveyqc.UnidadesDeMedida.model.UnidadesDeMedida;
@@ -63,6 +70,10 @@ import java.util.Map;
                 NivelesAnalitosControlRepository.class,
                 AnalitoControlRepository.class,
                 UbicacionesRepository.class,
+                CalibradoresRepository.class,
+                CorridaAnaliticaRepository.class,
+                MedicionesNivelesAnalitosRepository.class,
+                ReglasDeWestgardRepository.class,
         },
         entityManagerFactoryRef = "laboratorioEntityManagerFactory",
         transactionManagerRef = "laboratorioTransactionManager",
@@ -111,7 +122,11 @@ public class PersistenciaLaboratorioConfiguracion {
                         Controles.class,
                         NivelesAnalitosControl.class,
                         AnalitoControl.class,
-                        Ubicaciones.class
+                        Ubicaciones.class,
+                        Calibradores.class,
+                        CorridaAnalitica.class,
+                        MedicionesNivelesAnalitos.class,
+                        ReglasDeWestgard.class
                 )
                 .persistenceUnit("laboratorio")
                 .properties(propiedades)
