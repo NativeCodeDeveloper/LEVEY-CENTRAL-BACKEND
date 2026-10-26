@@ -1,7 +1,9 @@
 package cl.leveyqc.leveyqc.CorridaAnalitica.service;
-
 import cl.leveyqc.leveyqc.CorridaAnalitica.model.CorridaAnalitica;
 import cl.leveyqc.leveyqc.CorridaAnalitica.repository.CorridaAnaliticaRepository;
+import cl.leveyqc.leveyqc.SerieAnalitica.model.SerieAnalitica;
+import cl.leveyqc.leveyqc.SerieAnalitica.repository.SerieAnaliticaRepository;
+import cl.leveyqc.leveyqc.SerieAnalitica.service.SerieAnaliticaService;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -9,8 +11,14 @@ import java.util.Optional;
 @Service
 public class CorridaAnaliticaService {
     private final CorridaAnaliticaRepository repository;
-    public CorridaAnaliticaService(CorridaAnaliticaRepository repository) {
-        this.repository = repository;
+    private final SerieAnaliticaService serieAnaliticaService;
+
+
+    public CorridaAnaliticaService(
+            CorridaAnaliticaRepository repository,
+            SerieAnaliticaService serieAnaliticaService) {
+            this.repository = repository;
+            this.serieAnaliticaService = serieAnaliticaService;
     }
 
 
@@ -29,8 +37,29 @@ public class CorridaAnaliticaService {
         corridaAnaliticaNueva.setEstadoAnaliticoCorrida(1);
         corridaAnaliticaNueva.setUsuarioCreacion(c.getUsuarioCreacion());
         corridaAnaliticaNueva.setComentario("Sin comentarios");
+
+        SerieAnalitica serieAnaliticaNueva = new SerieAnalitica();
+        serieAnaliticaNueva.setUsuarioCreacion(c.getUsuarioCreacion());
+
+        SerieAnalitica resultadoInsercion = serieAnaliticaService.insertarPorDefault(serieAnaliticaNueva);
+
+
+        if (resultadoInsercion.getIdSerie() == null) {
+            System.out.println("No se puede insertar una serie. No subio el ID SERIE desde el servide de la serie");
+            return  null;
+        }
+
+
+        corridaAnaliticaNueva.setSerieId(resultadoInsercion.getIdSerie());
         return repository.save(corridaAnaliticaNueva);
     }
+
+
+
+
+
+
+
 
 
     public List<CorridaAnalitica> listarCorridasActivas(){

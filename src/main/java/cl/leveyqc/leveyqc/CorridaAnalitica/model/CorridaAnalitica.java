@@ -13,6 +13,7 @@ public class CorridaAnalitica extends EntidadAuditableLevey {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCorrida;
+    private Long serieId;
     private Integer estadoAnaliticoCorrida;
     private String comentario;
 

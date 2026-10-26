@@ -29,6 +29,8 @@ import cl.leveyqc.leveyqc.Proveedores.repository.ProveedoresRepository;
 import cl.leveyqc.leveyqc.ReglasDeWestgard.model.ReglasDeWestgard;
 import cl.leveyqc.leveyqc.ReglasDeWestgard.repository.ReglasDeWestgardRepository;
 import cl.leveyqc.leveyqc.ReglasDeWestgard.service.ReglasDeWestgardService;
+import cl.leveyqc.leveyqc.SerieAnalitica.model.SerieAnalitica;
+import cl.leveyqc.leveyqc.SerieAnalitica.repository.SerieAnaliticaRepository;
 import cl.leveyqc.leveyqc.Ubicaciones.model.Ubicaciones;
 import cl.leveyqc.leveyqc.Ubicaciones.repository.UbicacionesRepository;
 import cl.leveyqc.leveyqc.UnidadesDeMedida.model.UnidadesDeMedida;
@@ -74,6 +76,7 @@ import java.util.Map;
                 CorridaAnaliticaRepository.class,
                 MedicionesNivelesAnalitosRepository.class,
                 ReglasDeWestgardRepository.class,
+                SerieAnaliticaRepository.class
         },
         entityManagerFactoryRef = "laboratorioEntityManagerFactory",
         transactionManagerRef = "laboratorioTransactionManager",
@@ -126,7 +129,8 @@ public class PersistenciaLaboratorioConfiguracion {
                         Calibradores.class,
                         CorridaAnalitica.class,
                         MedicionesNivelesAnalitos.class,
-                        ReglasDeWestgard.class
+                        ReglasDeWestgard.class,
+                        SerieAnalitica.class
                 )
                 .persistenceUnit("laboratorio")
                 .properties(propiedades)
