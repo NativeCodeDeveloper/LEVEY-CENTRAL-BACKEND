@@ -182,12 +182,197 @@ corrida analítica, no entre corridas distintas.
 
         } else {
 
-            dto.setEstadoAnaliticoMedicion(0);
+            dto.setEstadoAnaliticoMedicion(null);
             dto.setReglasWestgardVioladas(null);
         }
 
         return dto;
     }
+
+
+
+    /*
+     * =====================================================================
+     * EVALUACIÓN DE LA REGLA WESTGARD 4-1s
+     * =====================================================================
+     *
+     * DESCRIPCIÓN:
+     *
+     * La regla 4-1s se viola cuando cuatro resultados consecutivos
+     * de control presentan un Z-Score:
+     *
+     *   - Mayor o igual a +1 DE en los cuatro resultados.
+     *   - Menor o igual a -1 DE en los cuatro resultados.
+     *
+     * Los cuatro resultados deben encontrarse del mismo lado
+     * de la media objetivo.
+     *
+     * Esta regla permite identificar posibles errores sistemáticos
+     * persistentes en el procedimiento analítico.
+     *
+     * RESULTADO DE LA EVALUACIÓN:
+     *
+     *   Regla violada:       "4-1s"
+     *   Estado analítico:    2 (RECHAZADO)
+     *   Tipo de error:       Sistemático
+     *
+     *
+     * =====================================================================
+     * LÓGICA ALGORÍTMICA A IMPLEMENTAR
+     * =====================================================================
+     *
+     * PASO 1: IDENTIFICAR EL NIVEL DE CONTROL
+     *
+     *   Obtener el identificador del nivel analítico correspondiente
+     *   a la medición actual.
+     *
+     *   Ejemplo:
+     *      Analito: Hemoglobina
+     *      Nivel: NIVEL 1
+     *      idNivelesAnalitosControl: 75
+     *
+     *
+     * PASO 2: RECUPERAR LAS MEDICIONES ANTERIORES
+     *
+     *   Consultar las últimas tres mediciones anteriores que cumplan:
+     *
+     *      - Mismo nivel de control analítico.
+     *      - Mismo analito y procedimiento analítico.
+     *      - Misma secuencia de seguimiento estadístico.
+     *      - Material y lote de control comparables.
+     *      - Mediciones con Z-Score válido.
+     *
+     *   IMPORTANTE:
+     *
+     *   Las mediciones pueden pertenecer a distintas corridas
+     *   analíticas, incluso de diferentes días.
+     *
+     *   No limitar la consulta al idCorrida actual.
+     *
+     *   Ordenar las mediciones cronológicamente de forma
+     *   descendente y recuperar únicamente las últimas tres.
+     *
+     *   No omitir mediciones intermedias por su estado de Westgard,
+     *   ya que se perdería la consecutividad de los resultados.
+     *
+     *
+     * PASO 3: VALIDAR LA CANTIDAD DE MEDICIONES
+     *
+     *   Verificar que existan tres mediciones anteriores válidas
+     *   para completar una secuencia de cuatro resultados.
+     *
+     *   Si existen menos de tres:
+     *
+     *      - No evaluar la regla 4-1s.
+     *      - No registrar una violación.
+     *      - Continuar con el procesamiento de la medición actual.
+     *
+     *
+     * PASO 4: OBTENER LOS CUATRO Z-SCORES
+     *
+     *   Recuperar los tres Z-Scores anteriores e incorporar
+     *   el Z-Score correspondiente a la medición actual.
+     *
+     *   Ejemplo:
+     *
+     *      Corrida 20: +1.20
+     *      Corrida 21: +1.35
+     *      Corrida 22: +1.50
+     *      Corrida 23: +1.15  <-- Medición actual
+     *
+     *
+     * PASO 5: EVALUAR LA REGLA 4-1s
+     *
+     *   CONDICIÓN A:
+     *
+     *      Verificar que los cuatro Z-Scores sean >= +1.
+     *
+     *   CONDICIÓN B:
+     *
+     *      Verificar que los cuatro Z-Scores sean <= -1.
+     *
+     *   Si se cumple cualquiera de las dos condiciones:
+     *
+     *      - Registrar la regla "4-1s".
+     *      - Asignar estado analítico 2 (RECHAZADO).
+     *
+     *   Si ninguna condición se cumple:
+     *
+     *      - No registrar la regla.
+     *      - Devolver estado analítico 0 para esta evaluación.
+     *
+     *
+     * PASO 6: INTEGRAR EL RESULTADO AL MOTOR WESTGARD
+     *
+     *   Incorporar la regla violada a listaReglasVioladas,
+     *   evitando duplicados.
+     *
+     *   Actualizar el estado analítico general conservando
+     *   siempre el estado de mayor gravedad.
+     *
+     *   Ejemplo:
+     *
+     *      estadoAnaliticoMedicion = Math.max(
+     *          estadoAnaliticoMedicion,
+     *          estadoWestgard_4_1s
+     *      );
+     *
+     *
+     * =====================================================================
+     * CONSIDERACIONES IMPORTANTES
+     * =====================================================================
+     *
+     * 1. La implementación inicial evaluará exclusivamente resultados
+     *    consecutivos del mismo nivel de control.
+     *
+     * 2. La evaluación podrá extenderse posteriormente a secuencias
+     *    que combinen distintos niveles, según el procedimiento de QC.
+     *
+     * 3. Un cambio de lote, mtodo o sistema analítico requiere
+     *    verificar si corresponde mantener la continuidad estadística.
+     *
+     * 4. La regla debe evaluarse al incorporar una nueva medición,
+     *    considerando su historial analítico comparable.
+     *
+     * 5. La ausencia de historial suficiente no debe impedir
+     *    guardar la medición actual.
+     *
+     * 6. La evaluación 4-1s no debe modificar las reglas Westgard
+     *    previamente detectadas por los otros análisis.
+     *
+     * =====================================================================
+     */
+
+    public AnalisisWestgardMedicionDTO analisisWestgard_4_1s(
+            BigDecimal zScoreActual,
+            BigDecimal zScoreOtraMedicion) {
+
+        System.out.println("########### MOTOR WESTGARD: R-4s");
+        AnalisisWestgardMedicionDTO dto = new AnalisisWestgardMedicionDTO();
+
+        if (zScoreActual.compareTo(BigDecimal.valueOf(2)) >= 0 &&
+                zScoreOtraMedicion.compareTo(BigDecimal.valueOf(-2)) <= 0) {
+
+            dto.setEstadoAnaliticoMedicion(2);
+            dto.setReglasWestgardVioladas("R-4s");
+
+        } else if (zScoreActual.compareTo(BigDecimal.valueOf(-2)) <= 0 &&
+                zScoreOtraMedicion.compareTo(BigDecimal.valueOf(2)) >= 0) {
+
+            dto.setEstadoAnaliticoMedicion(2);
+            dto.setReglasWestgardVioladas("R-4s");
+
+        } else {
+
+            dto.setEstadoAnaliticoMedicion(null);
+            dto.setReglasWestgardVioladas(null);
+        }
+
+        return dto;
+    }
+
+
+
 
 
 

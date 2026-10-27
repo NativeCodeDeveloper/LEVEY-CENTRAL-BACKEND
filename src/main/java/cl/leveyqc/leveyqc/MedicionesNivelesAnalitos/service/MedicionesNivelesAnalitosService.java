@@ -476,16 +476,47 @@ public class MedicionesNivelesAnalitosService {
                     );
 
             if (!listadoMismaCorridaDistintoNivel.isEmpty()){
-                Object[] primeraMedicion = listadoMismaCorridaDistintoNivel.get(0);
-                BigDecimal zScoreOtraMedicionDiferenteNivel =  (BigDecimal) primeraMedicion[9];
-                AnalisisWestgardMedicionDTO analisisWestgard_R_4s = motorWestgard.analisisWestgard_R_4s(zscore, zScoreOtraMedicionDiferenteNivel);
 
-                if (analisisWestgard_R_4s.getReglasWestgardVioladas()!=null){
-                    listaReglasVioladas.add(analisisWestgard_R_4s.getReglasWestgardVioladas());
-                    estadoAnaliticoMedicion = analisisWestgard_R_4s.getEstadoAnaliticoMedicion();
+
+                List <String>  estadosAnaliticosEncontrados = new ArrayList<>();
+                List <Integer> estadoAprobacion = new ArrayList<>();
+
+                for (Object[] elemento : listadoMismaCorridaDistintoNivel) {
+
+                    BigDecimal zScoreEncontrado = (BigDecimal) elemento[10];
+                    AnalisisWestgardMedicionDTO analisisWestgard_R_4s = motorWestgard.analisisWestgard_R_4s(zscore, zScoreEncontrado);
+
+                    if(analisisWestgard_R_4s.getReglasWestgardVioladas()!=null && analisisWestgard_R_4s.getEstadoAnaliticoMedicion() !=null ){
+                        estadosAnaliticosEncontrados.add(analisisWestgard_R_4s.getReglasWestgardVioladas());
+                        estadoAprobacion.add(analisisWestgard_R_4s.getEstadoAnaliticoMedicion());
+                    }
                 }
+
+                String reglaAlteradaFinal = null;
+                Integer estadoFinal = 0;
+
+
+                if (!estadosAnaliticosEncontrados.isEmpty()){
+                    for (Integer estado : estadoAprobacion){
+                        if (estado > estadoFinal){
+                            estadoFinal = estado;
+                        }
+                    }
+                }
+
+                if (!estadosAnaliticosEncontrados.isEmpty()){
+                    for (String estado : estadosAnaliticosEncontrados) {
+                        reglaAlteradaFinal=estado;
+                    }
+                }
+
+                if (reglaAlteradaFinal != null && estadoAprobacion != null){
+                    listaReglasVioladas.add(reglaAlteradaFinal);
+                    estadoAnaliticoMedicion = Math.max(estadoAnaliticoMedicion,estadoFinal);
+                }
+
                 System.out.println(" ########### MOTOR DE WESGARD : TERCER ANALISIS ");
-                System.out.println("  ----------> SEGUNDO TERCER ANALISIS ESTADISTICO APLICADO R-4s");
+                System.out.println("  ----------> TERCER ANALISIS ESTADISTICO APLICADO R-4s");
             }
 
         }
